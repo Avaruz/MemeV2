@@ -14,11 +14,9 @@ class SentMemesTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
         let object = UIApplication.sharedApplication().delegate
         let appDelegate = object as! AppDelegate
         memes = appDelegate.memes
-        
         tableView!.reloadData()
     }
     
@@ -49,7 +47,8 @@ class SentMemesTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let memeDetailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        memeDetailVC.meme = memes[indexPath.row]
+        memeDetailVC.indexItem = indexPath.item
+        
         navigationController?.pushViewController(memeDetailVC, animated: true)
     }
     

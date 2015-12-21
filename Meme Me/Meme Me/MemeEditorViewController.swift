@@ -21,6 +21,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var navBar: UIToolbar!
     
     var memeImage : UIImage!
+    var meme : Meme!
+    var indexItem : Int!
     
     let meme1Delegate = MemeTextFieldDelegate()
     let meme2Delegate = MemeTextFieldDelegate()
@@ -28,6 +30,13 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        //Check if the call it to edit
+        if let meme = self.meme {
+            topText.text = meme.topTextField
+            bottomText.text = meme.bottomTextField
+            imageView.image = meme.originalImage
+        }
     
     }
     
@@ -83,7 +92,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func resetAll(){
-        shareImageButton.enabled = false
+        shareImageButton.enabled = self.indexItem != nil ? true: false
         topText.text = "TOP"
         bottomText.text = "BOTTOM"
         imageView.image = nil
@@ -100,6 +109,12 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             (activity: String?, completed: Bool, items: [AnyObject]?, error: NSError?) -> Void in
             if completed {
                 self.save()
+                if self.indexItem != nil
+                {
+                    if let navigationController = self.navigationController {
+                        navigationController.popToRootViewControllerAnimated(true)
+                    }
+                }
                 self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
@@ -173,17 +188,29 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func save() {
-        
-       let meme = Meme(
-        topTextField: topText.text,
-        bottomTextField: bottomText.text,
-        originalImage: imageView.image,
-        memedImage: memeImage)
+        //lets get the delegate
         let object = UIApplication.sharedApplication().delegate
         let appDelegate = object as! AppDelegate
-        appDelegate.memes.append(meme)
         
+        //replace the original meme
+        
+        meme = Meme(
+            topTextField: topText.text,
+            bottomTextField: bottomText.text,
+            originalImage: imageView.image,
+            memedImage: memeImage)
+        
+        //if exist replace
+        if let indexItem = self.indexItem{
+         appDelegate.memes.removeAtIndex(indexItem)
+            appDelegate.memes.insert(meme, atIndex: indexItem)
+        }else
+        {
+            //if not append
+            appDelegate.memes.append(meme)
+        }
     }
+    
     
     func generateMemedImage() -> UIImage {
         
