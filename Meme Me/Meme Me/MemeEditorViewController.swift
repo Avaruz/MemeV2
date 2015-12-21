@@ -1,6 +1,6 @@
 //
-//  ViewController.swift
-//  PickingImages
+//  MemeEditorViewController
+//  Meme Me V2
 //
 //  Created by Adhemar Soria Galvarro on 12/10/15.
 //  Copyright © 2015 Adhemar Soria Galvarro. All rights reserved.
@@ -14,10 +14,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topText: UITextField!
     @IBOutlet weak var bottomText: UITextField!
-    var shareImageButton: UIBarButtonItem!
-    var cancelButton: UIBarButtonItem!
+    
+    @IBOutlet weak var shareImageButton: UIBarButtonItem!
+    @IBOutlet weak var cancelButton: UIBarButtonItem!
     @IBOutlet weak var toolBar: UIToolbar!
-    @IBOutlet weak var navBar: UINavigationBar!
+    @IBOutlet weak var navBar: UIToolbar!
     
     var memeImage : UIImage!
     
@@ -26,21 +27,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        if let navigationController = self.navigationController
-        {
-            navBar = navigationController.navigationBar
-        }
         setupUI()
     
     }
     
     func setupUI() {
-        shareImageButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Camera, target: self, action: "shareImage")
-        cancelButton = UIBarButtonItem(title: "Cancelar", style: UIBarButtonItemStyle.Plain,  target: self, action: "cancelAndBack")
-        
-        navigationItem.rightBarButtonItem = cancelButton
-        navigationItem.leftBarButtonItem = shareImageButton
         topText.delegate =  meme1Delegate
         bottomText.delegate = meme2Delegate
         resetAll()
@@ -64,6 +55,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
         topText.defaultTextAttributes=memeTextAttributes
         bottomText.defaultTextAttributes=memeTextAttributes
+        bottomText.textAlignment = NSTextAlignment.Center
+        topText.textAlignment = NSTextAlignment.Center
         topText.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
         bottomText.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
         
@@ -97,13 +90,13 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
     }
     
-    func shareImage(){
+    @IBAction func shareMeme(sender: UIBarButtonItem) {
         shareImageButton.enabled = false
         memeImage = generateMemedImage()
-        let controller = UIActivityViewController(activityItems: [memeImage], applicationActivities: nil)
+        let activityController = UIActivityViewController(activityItems: [memeImage], applicationActivities: nil)
 
         
-        controller.completionWithItemsHandler = {
+        activityController.completionWithItemsHandler = {
             (activity: String?, completed: Bool, items: [AnyObject]?, error: NSError?) -> Void in
             if completed {
                 self.save()
@@ -111,7 +104,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             }
         }
         
-        presentViewController(controller, animated: true, completion: nil)
+        presentViewController(activityController, animated: true, completion: nil)
  
     }
     
@@ -133,10 +126,9 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
     }
     
-    func cancelAndBack(){
-        if let navigationController = self.navigationController {
-            navigationController.popToRootViewControllerAnimated(true)
-        }
+    
+    @IBAction func cancelAndBack(sender: UIBarButtonItem) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     func keyboardWillShow(notification: NSNotification) {
@@ -182,7 +174,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     func save() {
         
-       let meme = Meme(topTextField: topText.text, bottomTextField: bottomText.text, originalImage: imageView.image, memedImage: memeImage)
+       let meme = Meme(
+        topTextField: topText.text,
+        bottomTextField: bottomText.text,
+        originalImage: imageView.image,
+        memedImage: memeImage)
         let object = UIApplication.sharedApplication().delegate
         let appDelegate = object as! AppDelegate
         appDelegate.memes.append(meme)

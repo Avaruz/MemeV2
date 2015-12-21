@@ -1,6 +1,6 @@
 //
 //  MemeTextEditDelegate.swift
-//  Meme Editor
+//  Meme Me V2
 //
 //  Created by Adhemar Soria Galvarro on 17/10/15.
 //  Copyright © 2015 Adhemar Soria Galvarro. All rights reserved.
